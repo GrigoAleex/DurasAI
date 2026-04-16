@@ -1,0 +1,38 @@
+# Python caches and artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Tool caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+
+# OS and editor files
+.DS_Store
+.idea/
+.vscode/
+
+# Local runtime outputs
+audio/*
+!audio/.gitkeep
+debug.wav
+blobs/
+
+# Local model weights and downloads
+models/*
+!models/.gitkeep
+
+# Local environment variables
+.env
