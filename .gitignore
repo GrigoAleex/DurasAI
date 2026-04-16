@@ -36,3 +36,7 @@ models/*
 
 # Local environment variables
 .env
+
+# Local OpenCode planning artifacts
+opencode/plans/*
+!opencode/plans/.gitkeep
