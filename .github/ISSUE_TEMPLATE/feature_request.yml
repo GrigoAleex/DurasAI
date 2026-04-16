@@ -1,0 +1,54 @@
+name: Feature request
+description: Propose an improvement aligned with project goals
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Share the user value first. Keep proposals practical and lightweight.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: What user pain exists today?
+      placeholder: The assistant only supports fixed record duration in CLI mode.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the smallest useful implementation.
+      placeholder: Add a CLI hold-to-record mode using key press/release.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Mention other approaches and tradeoffs.
+      placeholder: Keep fixed duration and increase seconds via env var.
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope and non-goals
+      description: Clarify what is in and out for this proposal.
+      placeholder: |
+        In scope: CLI capture behavior.
+        Out of scope: replacing Whisper/Piper integrations.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: This request aligns with the lightweight, local-first project vision.
+          required: true
+        - label: I searched existing issues and discussions first.
+          required: true
