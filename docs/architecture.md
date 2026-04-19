@@ -14,14 +14,15 @@ Both interfaces use the same processing pipeline:
 
 1. Capture user audio.
 2. Transcribe with `whisper-cli`.
-3. Send transcript to an OpenAI-compatible chat endpoint.
-4. Synthesize answer with Piper TTS.
-5. Play output audio.
+3. Optionally fetch web sources for time-sensitive or factual questions.
+4. Send transcript (and optional web context) to an OpenAI-compatible chat endpoint.
+5. Synthesize answer with Piper TTS.
+6. Play output audio.
 
 ## Runtime flow
 
 ```text
-User audio -> WAV -> whisper-cli -> transcript -> LLM API -> answer text -> Piper -> speaker
+User audio -> WAV -> whisper-cli -> transcript -> (optional web lookup) -> LLM API -> answer text -> Piper -> speaker
 ```
 
 ## Component responsibilities
@@ -29,6 +30,12 @@ User audio -> WAV -> whisper-cli -> transcript -> LLM API -> answer text -> Pipe
 - `config.py`
   - Single source of runtime settings from environment variables.
   - Applies numeric parsing with safe defaults.
+  - Controls internet connector behavior with `INTERNET_*` settings.
+
+- `internet_connector.py`
+  - Defines provider contract for web search.
+  - Implements DuckDuckGo HTTP lookup.
+  - Normalizes results into `Source` records and fails closed to empty results.
 
 - `main.py`
   - CLI orchestration pipeline.

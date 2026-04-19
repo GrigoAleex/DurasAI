@@ -8,7 +8,7 @@ import numpy as np
 import sounddevice as sd
 
 from config import INPUT_WAV
-from main import ask_llm, speak, transcribe
+from main import ask_llm, format_assistant_output, speak, transcribe
 
 
 class HoldToTalkRecorder:
@@ -279,12 +279,13 @@ class VoiceAssistantApp(tk.Tk):
             self.after(0, self.user_var.set, user_text)
             self.after(0, self.status_var.set, "Thinking...")
 
-            answer = ask_llm(user_text)
-            self.after(0, self.assistant_var.set, answer)
+            response = ask_llm(user_text)
+            assistant_display = format_assistant_output(response)
+            self.after(0, self.assistant_var.set, assistant_display)
             self.after(0, self.status_var.set, "AI speaking...")
 
             self.is_speaking = True
-            speak(answer)
+            speak(response.answer)
             self.after(0, self.status_var.set, "Ready for next turn")
         except Exception as exc:
             self.after(0, self.status_var.set, f"Error: {exc}")
