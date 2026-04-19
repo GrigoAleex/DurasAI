@@ -30,9 +30,11 @@ Optional internet connector settings in `.env`:
 ```bash
 INTERNET_ENABLED=true
 INTERNET_MODE=auto
-INTERNET_PROVIDER=duckduckgo
+INTERNET_PROVIDER=tavily
 INTERNET_TIMEOUT_SEC=6
 INTERNET_TOP_K=3
+TAVILY_API_KEY=YOUR_TAVILY_API_KEY
+TAVILY_SEARCH_DEPTH=basic  # basic|advanced
 ```
 
 ## Required before opening a PR

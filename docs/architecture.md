@@ -34,7 +34,7 @@ User audio -> WAV -> whisper-cli -> transcript -> (optional web lookup) -> LLM A
 
 - `internet_connector.py`
   - Defines provider contract for web search.
-  - Implements DuckDuckGo HTTP lookup.
+  - Implements Tavily Search API lookup.
   - Normalizes results into `Source` records and fails closed to empty results.
 
 - `main.py`

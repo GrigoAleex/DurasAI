@@ -25,6 +25,8 @@ from config import (
     PIPER_MODEL,
     RECORD_SECONDS,
     SYSTEM_PROMPT,
+    TAVILY_API_KEY,
+    TAVILY_SEARCH_DEPTH,
     WHISPER_BIN,
     WHISPER_LANGUAGE,
     WHISPER_MODEL,
@@ -119,11 +121,17 @@ def _should_use_internet(text):
 
 
 def _lookup_sources(query):
-    if INTERNET_PROVIDER != "duckduckgo":
+    if INTERNET_PROVIDER != "tavily":
         return []
 
     try:
-        return search_internet(query=query, top_k=INTERNET_TOP_K, timeout=INTERNET_TIMEOUT_SEC)
+        return search_internet(
+            query=query,
+            top_k=INTERNET_TOP_K,
+            timeout=INTERNET_TIMEOUT_SEC,
+            api_key=TAVILY_API_KEY,
+            search_depth=TAVILY_SEARCH_DEPTH,
+        )
     except Exception:
         return []
 
