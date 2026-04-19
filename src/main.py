@@ -1,15 +1,21 @@
 import io
+import logging
 import subprocess
 import wave
 from pathlib import Path
 
 import numpy as np
-import requests
 import sounddevice as sd
 from piper import PiperVoice
 
+from app_logging import configure_logging
+from brain import BrainBuilder
 from config import (
     INPUT_WAV,
+    INTERNET_MODE,
+    INTERNET_PROVIDER,
+    INTERNET_TIMEOUT_SEC,
+    INTERNET_TOP_K,
     LLM_API_URL,
     LLM_MAX_TOKENS,
     LLM_MODEL,
@@ -18,6 +24,8 @@ from config import (
     PIPER_MODEL,
     RECORD_SECONDS,
     SYSTEM_PROMPT,
+    TAVILY_API_KEY,
+    TAVILY_SEARCH_DEPTH,
     WHISPER_BIN,
     WHISPER_LANGUAGE,
     WHISPER_MODEL,
@@ -26,6 +34,22 @@ from config import (
 Path(INPUT_WAV).parent.mkdir(parents=True, exist_ok=True)
 
 _voice = None
+logger = logging.getLogger(__name__)
+brain = (
+    BrainBuilder()
+    .with_system_prompt(SYSTEM_PROMPT)
+    .with_llm_api_url(LLM_API_URL)
+    .with_llm_model(LLM_MODEL)
+    .with_llm_temperature(LLM_TEMPERATURE)
+    .with_llm_max_tokens(LLM_MAX_TOKENS)
+    .with_internet_mode(INTERNET_MODE)
+    .with_internet_provider(INTERNET_PROVIDER)
+    .with_internet_timeout_sec(INTERNET_TIMEOUT_SEC)
+    .with_internet_top_k(INTERNET_TOP_K)
+    .with_tavily_api_key(TAVILY_API_KEY)
+    .with_tavily_search_depth(TAVILY_SEARCH_DEPTH)
+    .build()
+)
 
 
 def _get_voice():
@@ -66,25 +90,18 @@ def transcribe():
     lines = [line.strip() for line in result.stdout.splitlines() if line.strip()]
     return lines[-1] if lines else ""
 
-def ask_llm(text):
-    payload = {
-        "model": LLM_MODEL,
-        "messages": [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": text}
-        ],
-        "temperature": LLM_TEMPERATURE,
-        "max_tokens": LLM_MAX_TOKENS
-    }
 
-    r = requests.post(
-        LLM_API_URL,
-        json=payload,
-        timeout=120
-    )
-    r.raise_for_status()
-    data = r.json()
-    return data["choices"][0]["message"]["content"].strip()
+def format_assistant_output(response):
+    answer = response.answer.strip()
+    if not response.sources:
+        return answer
+
+    lines = [answer, "", "Sources:"]
+    for source in response.sources:
+        title = source.title or source.url
+        lines.append(f"[{source.id}] {title} - {source.url}")
+
+    return "\n".join(lines)
 
 def speak(text):
     voice = _get_voice()
@@ -104,23 +121,32 @@ def speak(text):
     sd.wait()
 
 def main():
-    print("Recording...")
+    log_path = configure_logging()
+    logger.info("CLI started; log file: %s", log_path)
+
+    logger.info("Recording...")
     record_audio()
 
-    print("Transcribing...")
+    logger.info("Transcribing...")
     user_text = transcribe()
-    print("USER:", user_text)
+    logger.info("USER: %s", user_text)
 
     if not user_text:
-        print("No speech detected.")
+        logger.warning("No speech detected.")
         return
 
-    print("Generating...")
-    answer = ask_llm(user_text)
-    print("ASSISTANT:", answer)
+    logger.info("Generating...")
+    response = brain.ask(user_text)
+    logger.info("ASSISTANT: %s", response.answer)
 
-    print("Speaking...")
-    speak(answer)
+    if response.sources:
+        logger.info("SOURCES:")
+        for source in response.sources:
+            title = source.title or source.url
+            logger.info("[%s] %s - %s", source.id, title, source.url)
+
+    logger.info("Speaking...")
+    speak(response.answer)
 
 if __name__ == "__main__":
     main()

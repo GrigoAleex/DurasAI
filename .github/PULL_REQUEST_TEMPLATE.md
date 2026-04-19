@@ -9,7 +9,7 @@
 
 ## Validation
 
-- [ ] I ran `python3 -m py_compile config.py main.py gui_app.py`
+- [ ] I ran `python3 -m py_compile src/config.py src/config_utils.py src/internet_connector.py src/app_logging.py src/brain.py src/main.py src/gui_app.py`
 - [ ] I tested the affected flow(s) end-to-end (CLI and/or GUI)
 - [ ] I included logs/screenshots/output where useful
 

@@ -26,4 +26,4 @@ jobs:
           pip install -r requirements.txt
 
       - name: Verify Python files compile
-        run: python -m py_compile config.py main.py gui_app.py
+        run: python -m py_compile src/config.py src/config_utils.py src/internet_connector.py src/app_logging.py src/brain.py src/main.py src/gui_app.py

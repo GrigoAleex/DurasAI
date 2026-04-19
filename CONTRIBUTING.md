@@ -21,8 +21,19 @@ cp .env.example .env
 Run the app:
 
 ```bash
-python main.py
-python gui_app.py
+python src/main.py
+python src/gui_app.py
+```
+
+Optional internet connector settings in `.env`:
+
+```bash
+INTERNET_MODE=auto
+INTERNET_PROVIDER=tavily
+INTERNET_TIMEOUT_SEC=6
+INTERNET_TOP_K=3
+TAVILY_API_KEY=YOUR_TAVILY_API_KEY
+TAVILY_SEARCH_DEPTH=basic  # basic|advanced
 ```
 
 ## Required before opening a PR
@@ -31,7 +42,7 @@ python gui_app.py
 2. Run the project check:
 
 ```bash
-python3 -m py_compile config.py main.py gui_app.py
+python3 -m py_compile src/config.py src/config_utils.py src/internet_connector.py src/app_logging.py src/brain.py src/main.py src/gui_app.py
 ```
 
 3. Test the affected flow(s) end-to-end (CLI, GUI, or both depending on your change).
