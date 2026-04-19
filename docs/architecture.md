@@ -7,8 +7,8 @@
 
 DurasAI is a local-first voice assistant with two interfaces:
 
-- CLI entrypoint: `main.py`
-- GUI entrypoint: `gui_app.py`
+- CLI entrypoint: `src/main.py`
+- GUI entrypoint: `src/gui_app.py`
 
 Both interfaces use the same processing pipeline:
 
@@ -27,22 +27,34 @@ User audio -> WAV -> whisper-cli -> transcript -> (optional web lookup) -> LLM A
 
 ## Component responsibilities
 
-- `config.py`
+- `src/config.py`
   - Single source of runtime settings from environment variables.
   - Applies numeric parsing with safe defaults.
   - Controls internet connector behavior with `INTERNET_*` settings.
 
-- `internet_connector.py`
+- `src/config_utils.py`
+  - Shared parsing helpers for env-backed runtime settings.
+
+- `src/internet_connector.py`
   - Defines provider contract for web search.
   - Implements Tavily Search API lookup.
   - Normalizes results into `Source` records and fails closed to empty results.
 
-- `main.py`
+- `src/brain.py`
+  - LLM orchestration and optional web augmentation.
+  - `Brain.ask(user_input)` is the shared request path for both CLI and GUI.
+  - `BrainBuilder` configures `Brain` from runtime settings.
+
+- `src/app_logging.py`
+  - Initializes root logging for both app entrypoints.
+  - Creates per-start log files at `logs/{timestamp}.log`.
+
+- `src/main.py`
   - CLI orchestration pipeline.
   - CLI recording currently uses `ffmpeg -f avfoundation -i :0` (macOS specific).
-  - Hosts shared functions used by GUI: `transcribe()`, `ask_llm()`, `speak()`.
+  - Builds a shared `brain` instance and hosts shared functions used by GUI: `transcribe()`, `speak()`, `format_assistant_output()`.
 
-- `gui_app.py`
+- `src/gui_app.py`
   - Tkinter hold-to-talk experience.
   - Uses `sounddevice.InputStream` for press-and-hold capture.
   - Runs long operations in a worker thread.
@@ -54,6 +66,7 @@ Runtime artifacts are local-only and excluded from git:
 
 - `.env`
 - `audio/`
+- `logs/`
 - `models/`
 - `blobs/`
 
@@ -64,7 +77,7 @@ The repository keeps `.gitkeep` placeholders where needed.
 Current CI and local baseline check:
 
 ```bash
-python3 -m py_compile config.py main.py gui_app.py
+python3 -m py_compile src/config.py src/config_utils.py src/internet_connector.py src/app_logging.py src/brain.py src/main.py src/gui_app.py
 ```
 
 CI runs this on Python 3.12.

@@ -27,6 +27,7 @@ dist/
 # Local runtime outputs
 audio/*
 !audio/.gitkeep
+logs/
 debug.wav
 blobs/
 

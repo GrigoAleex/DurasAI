@@ -5,7 +5,6 @@ from typing import Any, Protocol
 
 import requests
 
-
 @dataclass(frozen=True)
 class Source:
     id: int

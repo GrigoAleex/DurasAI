@@ -24,7 +24,7 @@ body:
       label: Steps to reproduce
       description: Provide exact steps and inputs.
       placeholder: |
-        1. Run `python gui_app.py`
+        1. Run `python src/gui_app.py`
         2. Hold the Talk button for 3 seconds
         3. Release and observe error
     validations:
@@ -51,7 +51,7 @@ body:
     attributes:
       label: Environment
       description: OS, Python version, and how you run the app.
-      placeholder: macOS 14.6, Python 3.12, `python gui_app.py`
+      placeholder: macOS 14.6, Python 3.12, `python src/gui_app.py`
     validations:
       required: true
 

@@ -1,3 +1,4 @@
+import logging
 import math
 import threading
 import wave
@@ -7,8 +8,11 @@ import tkinter as tk
 import numpy as np
 import sounddevice as sd
 
+from app_logging import configure_logging
 from config import INPUT_WAV
-from main import ask_llm, format_assistant_output, speak, transcribe
+from main import brain, format_assistant_output, speak, transcribe
+
+logger = logging.getLogger(__name__)
 
 
 class HoldToTalkRecorder:
@@ -240,6 +244,7 @@ class VoiceAssistantApp(tk.Tk):
         try:
             self.recorder.start()
         except Exception as exc:
+            logger.exception("Microphone error")
             self.status_var.set(f"Microphone error: {exc}")
             return
         self.is_recording = True
@@ -254,6 +259,7 @@ class VoiceAssistantApp(tk.Tk):
         try:
             duration = self.recorder.stop(INPUT_WAV)
         except Exception as exc:
+            logger.exception("Recording failed")
             self.status_var.set(f"Recording failed: {exc}")
             self._set_button_idle()
             return
@@ -273,13 +279,14 @@ class VoiceAssistantApp(tk.Tk):
         try:
             user_text = transcribe()
             if not user_text:
+                logger.info("No speech detected")
                 self.after(0, self.status_var.set, "No speech detected. Try again.")
                 return
 
             self.after(0, self.user_var.set, user_text)
             self.after(0, self.status_var.set, "Thinking...")
 
-            response = ask_llm(user_text)
+            response = brain.ask(user_text)
             assistant_display = format_assistant_output(response)
             self.after(0, self.assistant_var.set, assistant_display)
             self.after(0, self.status_var.set, "AI speaking...")
@@ -288,6 +295,7 @@ class VoiceAssistantApp(tk.Tk):
             speak(response.answer)
             self.after(0, self.status_var.set, "Ready for next turn")
         except Exception as exc:
+            logger.exception("GUI turn failed")
             self.after(0, self.status_var.set, f"Error: {exc}")
         finally:
             self.is_speaking = False
@@ -352,6 +360,8 @@ class VoiceAssistantApp(tk.Tk):
 
 
 def main():
+    log_path = configure_logging()
+    logger.info("GUI started; log file: %s", log_path)
     app = VoiceAssistantApp()
     app.mainloop()
 
