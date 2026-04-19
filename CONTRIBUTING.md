@@ -25,6 +25,16 @@ python main.py
 python gui_app.py
 ```
 
+Optional internet connector settings in `.env`:
+
+```bash
+INTERNET_ENABLED=true
+INTERNET_MODE=auto
+INTERNET_PROVIDER=duckduckgo
+INTERNET_TIMEOUT_SEC=6
+INTERNET_TOP_K=3
+```
+
 ## Required before opening a PR
 
 1. Verify your change locally.
