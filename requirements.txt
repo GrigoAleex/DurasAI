@@ -16,4 +16,4 @@ requests==2.33.1
 sounddevice==0.5.5
 sympy==1.14.0
 tk==0.1.0
-urllib3==2.6.3
+urllib3==2.7.0
